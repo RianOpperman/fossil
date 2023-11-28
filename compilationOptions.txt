@@ -1,0 +1,11 @@
+Recommended:
+	-ffreestanding
+		Lets compiler know it is building a kernel instead of user-space program
+	-mno-red-zone
+		Interrupts can corrupt the stack, so we don't have a red zone anymore
+
+When linking use these options:
+	- nostdlib
+		Specify we won't have a standard lib on target
+	- lgcc
+		Link our own libgcc
