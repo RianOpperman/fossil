@@ -1,2 +1,2 @@
 # fossil
-Custom UNIX like 64-bit OS written in C &amp; Rust
+Custom UNIX like 64-bit OS written in C & Rust
