@@ -26,7 +26,7 @@ iso: $(kernel) grub.cfg
 run:
 	qemu-system-i386 -cdrom $(isoFile)
 
-runK:
+runk runK:
 	qemu-system-i386 -kernel $(kernel)
 
 clean:
