@@ -4,13 +4,23 @@
 
 // Check to see we aren't targeting the wrong OS
 #if defined(__linux__)
-#error "You aren't using a cross-compiler, will run into troubles"
+// #error "You aren't using a cross-compiler, will run into troubles"
 #endif
 
 // Make sure we only build for 32-bit x86 targets
 #if !defined(__i386__)
-#error "Code only works with 32-bit elf compiler, i.e. i686-elf"
+// #error "Code only works with 32-bit elf compiler, i.e. i686-elf"
 #endif
+
+// Declarations
+size_t strlen(const char* str);
+void terminal_init(void);
+void terminal_setcolor(uint8_t color);
+void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
+void terminal_putchar(char c);
+void terminal_write(const char* data, size_t size);
+void terminal_writestring(const char* data);
+void kernel_main(void);
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -32,7 +42,7 @@ enum vga_color {
 };
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
-    return fg | bg << 4;
+    return (uint8_t)fg | (uint8_t)bg << 4;
 }
 
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {

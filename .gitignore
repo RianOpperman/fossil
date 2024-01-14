@@ -58,3 +58,6 @@ iso/
 
 # IDE files
 .vscode/
+
+# Testing file
+rs/

@@ -1,37 +1,61 @@
-kernel := fossil.bin
-isoFile := fossil.iso
-linkFiles := kernel.o boot.o
-compileOptions := -ffreestanding -O2 -Wall -Wextra
-linkOptions := -ffreestanding -O2 -nostdlib
+# Flags & various variables
+CC := i686-elf-gcc
+AS := i686-elf-as
+PROJ_DIRS := src
+BOOT_FILE := $(shell find $(PROJ_DIRS) -type f -name "boot.s")
+SRC_FILES := $(shell find $(PROJ_DIRS) -type f -name "*.c")
+HDR_FILES := $(shell find $(PROJ_DIRS) -type f -name "*.h")
 
-all: assemble compile link
+BOOT_OBJ_FILES := $(patsubst %.s, %.o, $(BOOT_FILE))
+C_OBJ_FILES := $(patsubst %.c,%.o,$(SRC_FILES))
+OBJ_FILES := $(C_OBJ_FILES) $(BOOT_OBJ_FILES)
 
-assemble: boot.s
-	i686-elf-as boot.s -o boot.o
+DEP_FILES := $(patsubst %.c,%.d,$(SRC_FILES))
+LINKER_FILES := $(shell find $(PROJ_DIRS) -type f -name "*.ld")
+CFG_FILES := $(shell find $(PROJ_DIRS) -type f -name "*.cfg")
 
-compile: kernel.c
-	i686-elf-gcc -c kernel.c -o kernel.o $(compileOptions)
+WARNINGS := -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
+            -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Winline \
+			-Wno-long-long -Wconversion -Wstrict-prototypes
+CFLAGS := -ffreestanding -O2 $(WARNINGS)
+LFLAGS := -ffreestanding -O2 -nostdlib
 
-link:
-	i686-elf-gcc -T linker.ld -o fossil.bin $(linkOptions) $(linkFiles) -lgcc
+KERNEL := fossil.bin
+ISO := fossil.iso
+EMULATOR := qemu-system-i386
 
-verify: $(kernel)
-	grub-file --is-x86-multiboot $(kernel)
+.PHONY: all clean run runk runK iso verify
 
-iso: $(kernel) grub.cfg
-	cp $(kernel) iso/boot
-	cp grub.cfg iso/boot/grub
-	grub-mkrescue -o $(isoFile) iso
+all: $(BOOT_OBJ_FILES) $(OBJ_FILES) fossil.bin
+
+# Source files & Compilation
+$(BOOT_OBJ_FILES): $(BOOT_FILE)
+	@$(AS) $(BOOT_FILE) -o $(BOOT_OBJ_FILES)
+
+%.o: %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(KERNEL): $(OBJ_FILES)
+	@$(CC) $(LFLAGS) -T $(LINKER_FILES) -o $(KERNEL) $(OBJ_FILES) -lgcc
+
+# Run commands
+verify: $(KERNEL)
+	grub-file --is-x86-multiboot $(KERNEL)
+
+iso: $(KERNEL) $(CFG_FILES)
+	@cp $(KERNEL) iso/boot
+	@cp $(CFG_FILES) iso/boot/grub
+	@grub-mkrescue -o $(ISO) iso
 
 run:
-	qemu-system-i386 -cdrom $(isoFile)
+	@$(EMULATOR) -cdrom $(ISO)
 
 runk runK:
-	qemu-system-i386 -kernel $(kernel)
+	@$(EMULATOR) -kernel $(KERNEL)
 
 clean:
-	rm -f *.o
-	rm -rf iso
-	rm -f $(kernel)
-	rm -f $(isoFile)
-	mkdir -p iso/boot/grub
+	@rm -f $(OBJ_FILES)
+	@rm -rf iso
+	@rm -f $(KERNEL)
+	@rm -f $(ISO)
+	@mkdir -p iso/boot/grub
