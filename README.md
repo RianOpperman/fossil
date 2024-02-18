@@ -1,9 +1,19 @@
-# fossil
-Custom UNIX like 64-bit OS written in C & Rust
+# Fossil
+Custom UNIX like 64-bit OS written in C using a Rust written library
 
 ## Requirements
 
-- grub2 (i.e. `sudo apt install grub2`)
-- x86-64 GCC cross compiler (v 13.2.0)
-	- This can be downloaded from the [i686-elf-tools repo](https://github.com/lordmilko/i686-elf-tools)
-	- Can also be compiled from source
+- `clang`
+- `lld-link`
+- `xorriso`
+- `qemu-system-x86_64`
+
+## Information
+The OS is UEFI compatible & uses a custom made UEFI-based bootloader called `uitgrawe` (pronounced "uh-ate-gra-ve"), which is written in C. 
+
+`clang` is used as the compiler due to its ability to support both UEFI applications (Windows PE format) and ELF files (Linux format).
+
+### Uitgrawe
+"Uitgrawe" means "excavate" in English, which is why it's the bootloader to set up everything for the `fossil` OS.
+
+The GNU-EFI library is used under the hood to enable the bootloader to talk to the UEFI firmware. It is included in the repo for your convenience.
