@@ -17,3 +17,4 @@ The OS is UEFI compatible & uses a custom made UEFI-based bootloader called `uit
 "Uitgrawe" means "excavate" in English, which is why it's the bootloader to set up everything for the `fossil` OS.
 
 The GNU-EFI library is used under the hood to enable the bootloader to talk to the UEFI firmware. It is included in the repo for your convenience.
+Additionally, the OVMF firmware binaries are used with `qemu` to boot into a UEFI environment for the bootloader to take action. It has also been included for your convenience.
