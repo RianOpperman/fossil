@@ -55,6 +55,9 @@ dkms.conf
 # ISO info
 *.iso
 iso/
+*.img
+*.EFI
+*.ISO
 
 # IDE files
 .vscode/
